@@ -1,0 +1,22 @@
+# Dataset (unduh dari Kaggle, jangan di-commit)
+dataset_gabung_fix/
+
+# Hasil yang bisa dibuat ulang / terlalu besar
+preprocessing_output/preprocessed_224.npz
+hasil_M*/best.keras
+*.keras
+*.h5
+evaluasi_output/prediksi_uji_*.csv
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Editor & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

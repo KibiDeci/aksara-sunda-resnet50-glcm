@@ -1,0 +1,12 @@
+
+RINGKASAN EDA
+- Total gambar mentah      : 1,800
+- Jumlah kelas             : 30
+- Gambar korup / duplikat  : 0 / 2
+- Ukuran median (w x h)    : 410 x 403 px
+- Imbalance ratio kelas    : 1.00x (min 60, max 60)
+- Mode warna               : RGB=1257, L=543 (konversi ke RGB)
+- Sumber gambar            : lainnya=1200, kamera=600
+- Gambar < 380px           : 616 (34.2%)
+- Setelah pembersihan      : 1,799 gambar
+- Split train/val/test     : 1,259 / 270 / 270

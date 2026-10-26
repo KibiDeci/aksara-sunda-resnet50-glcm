@@ -1,0 +1,11 @@
+tensorflow>=2.16
+scikit-image
+opencv-python
+scikit-learn
+pandas
+matplotlib
+joblib
+pillow
+fastapi
+uvicorn
+python-multipart

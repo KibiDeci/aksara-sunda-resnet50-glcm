@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pengenalan Aksara Sunda</title>
+<style>
+  @font-face { font-family: "Noto Sans Sundanese"; font-display: swap;
+    src: url("fonts/noto-sans-sundanese-sundanese-400-normal.woff2") format("woff2"); }
+  :root {
+    --bg: #f6f4ef; --card: #ffffff; --ink: #1d1f24; --muted: #6b6f78; --line: #e4e0d6;
+    --accent: #1f5f5b; --accent-soft: #e3efed; --warn: #9a5b00; --warn-soft: #fbf0dc;
+    --bar: #d9e7e5; --radius: 14px;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --sunda: "Noto Sans Sundanese", var(--sans);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+  header { padding: 22px 16px 6px; max-width: 980px; margin: 0 auto; }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
+  header h1 span { font-family: var(--sunda); color: var(--accent); margin-right: 8px; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  main { max-width: 980px; margin: 0 auto; padding: 14px 16px 32px;
+         display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .card h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600; }
+  .tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 10px; margin-bottom: 14px; }
+  .tabs button { flex: 1; border: 0; background: transparent; padding: 8px; border-radius: 8px;
+                 font: inherit; color: var(--muted); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--card); color: var(--ink); font-weight: 600;
+                                       box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .pane[hidden] { display: none; }
+  canvas { width: 100%; aspect-ratio: 1; display: block; border: 1px dashed #c9c3b5; border-radius: 10px;
+           background: #fff; touch-action: none; cursor: crosshair; }
+  .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+  .drop { display: grid; place-items: center; aspect-ratio: 1; border: 1px dashed #c9c3b5; border-radius: 10px;
+          background: #fff; text-align: center; color: var(--muted); cursor: pointer; overflow: hidden; }
+  .drop img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .row { display: flex; gap: 8px; margin-top: 12px; }
+  .btn { flex: 1; padding: 10px 14px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer;
+         border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .empty { color: var(--muted); text-align: center; padding: 48px 12px; }
+  .empty .glyph { font-family: var(--sunda); font-size: 64px; color: #cfc9bb; line-height: 1.2; }
+  .top { display: flex; align-items: center; gap: 18px; }
+  .top .glyph { font-family: var(--sunda); font-size: 84px; line-height: 1; color: var(--accent);
+                width: 112px; height: 112px; display: grid; place-items: center;
+                background: var(--accent-soft); border-radius: 12px; flex: none; }
+  .top .name { font-size: 26px; font-weight: 700; }
+  .top .conf { color: var(--muted); }
+  .warn { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft);
+          color: var(--warn); font-size: 13px; }
+  .list { margin: 16px 0 0; padding: 0; list-style: none; }
+  .list li { display: grid; grid-template-columns: 34px 70px 1fr 54px; align-items: center; gap: 8px;
+             padding: 5px 0; font-size: 14px; }
+  .list .g { font-family: var(--sunda); font-size: 22px; text-align: center; }
+  .track { height: 8px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .track, .fill { display: block; }
+  .fill { height: 100%; background: var(--accent); border-radius: 99px; }
+  .list li:not(:first-child) .fill { background: #9fbfbb; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .meta { display: flex; gap: 14px; align-items: center; margin-top: 16px; padding-top: 14px;
+          border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  .meta img { width: 64px; height: 64px; border: 1px solid var(--line); border-radius: 8px; }
+  .err { color: #a3261c; }
+  footer { max-width: 980px; margin: 0 auto; padding: 0 16px 24px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>ᮃᮊ᮪ᮞᮛ</span>Pengenalan Aksara Sunda</h1>
+  <p>Tulis atau unggah satu karakter aksara Sunda (swara atau ngalagena), lalu tekan <b>Kenali</b>.</p>
+</header>
+
+<main>
+  <section class="card" aria-label="Masukan">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="draw">Gambar langsung</button>
+      <button role="tab" aria-selected="false" data-tab="upload">Unggah foto</button>
+    </div>
+
+    <div class="pane" id="pane-draw">
+      <canvas id="pad" width="448" height="448" aria-label="Kanvas untuk menulis aksara"></canvas>
+      <p class="hint">Tulis satu karakter dengan mouse atau jari. Ukuran dan posisi bebas.</p>
+    </div>
+
+    <div class="pane" id="pane-upload" hidden>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="image/png,image/jpeg" hidden>
+        <span id="drop-text">Klik atau seret foto ke sini<br><small>JPG/PNG, satu karakter, latar terang, maks. 5 MB</small></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <button class="btn" id="clear">Hapus</button>
+      <button class="btn primary" id="go">Kenali</button>
+    </div>
+  </section>
+
+  <section class="card" aria-live="polite">
+    <h2>Hasil</h2>
+    <div id="result">
+      <div class="empty"><div class="glyph">ᮃ ᮊ ᮞ</div>Belum ada masukan.</div>
+    </div>
+  </section>
+</main>
+<footer id="foot">Memuat informasi model…</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+let mode = "draw", uploaded = null, drawn = false;
+
+// --- Tab ---
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+  mode = b.dataset.tab;
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#pane-draw").hidden = mode !== "draw";
+  $("#pane-upload").hidden = mode !== "upload";
+});
+
+// --- Kanvas gambar ---
+const pad = $("#pad"), ctx = pad.getContext("2d");
+function resetPad() {
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, pad.width, pad.height);
+  ctx.lineWidth = 14; ctx.lineCap = ctx.lineJoin = "round"; ctx.strokeStyle = "#111";
+  drawn = false;
+}
+resetPad();
+let down = false;
+const pos = e => { const r = pad.getBoundingClientRect();
+  return [(e.clientX - r.left) * pad.width / r.width, (e.clientY - r.top) * pad.height / r.height]; };
+pad.onpointerdown = e => { down = true; drawn = true; pad.setPointerCapture(e.pointerId);
+  const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + .1, y); ctx.stroke(); };
+pad.onpointermove = e => { if (!down) return; const [x, y] = pos(e); ctx.lineTo(x, y); ctx.stroke(); };
+pad.onpointerup = pad.onpointercancel = () => down = false;
+
+// --- Unggah ---
+const drop = $("#drop");
+function setFile(f) {
+  if (!f) return;
+  uploaded = f;
+  const url = URL.createObjectURL(f);
+  $("#drop-text").innerHTML = `<img src="${url}" alt="Pratinjau">`;
+}
+$("#file").onchange = e => setFile(e.target.files[0]);
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); setFile(e.dataTransfer.files[0]); };
+
+$("#clear").onclick = () => {
+  if (mode === "draw") resetPad();
+  else { uploaded = null; $("#file").value = "";
+    $("#drop-text").innerHTML = 'Klik atau seret foto ke sini<br><small>JPG/PNG, satu karakter, latar terang, maks. 5 MB</small>'; }
+  showEmpty();
+};
+
+function showEmpty() {
+  $("#result").innerHTML = '<div class="empty"><div class="glyph">ᮃ ᮊ ᮞ</div>Belum ada masukan.</div>';
+}
+
+// --- Kirim ke backend ---
+$("#go").onclick = async () => {
+  let blob;
+  if (mode === "draw") {
+    if (!drawn) return showError("Tulis satu karakter di kanvas terlebih dahulu.");
+    blob = await new Promise(r => pad.toBlob(r, "image/png"));
+  } else {
+    if (!uploaded) return showError("Pilih foto terlebih dahulu.");
+    blob = uploaded;
+  }
+  const fd = new FormData(); fd.append("file", blob, "input.png");
+  $("#go").disabled = true; $("#go").textContent = "Memproses…";
+  try {
+    const res = await fetch("api/predict", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Gagal memproses citra.");
+    render(data);
+  } catch (err) { showError(err.message); }
+  finally { $("#go").disabled = false; $("#go").textContent = "Kenali"; }
+};
+
+function showError(msg) { $("#result").innerHTML = `<div class="empty err">${msg}</div>`; }
+
+const pct = p => (p * 100).toFixed(1) + "%";
+function render(d) {
+  const [best, ...rest] = d.prediksi;
+  const low = best.probabilitas < 0.5;
+  $("#result").innerHTML = `
+    <div class="top">
+      <div class="glyph">${best.aksara}</div>
+      <div><div class="name">${best.baca}</div>
+        <div class="conf">Keyakinan model ${pct(best.probabilitas)}</div></div>
+    </div>
+    ${low ? '<div class="warn">Keyakinan rendah. Coba tulis ulang lebih jelas, atau gunakan foto dengan latar polos.</div>' : ""}
+    <ul class="list">${d.prediksi.map(p => `
+      <li><span class="g">${p.aksara}</span><span>${p.baca}</span>
+        <span class="track"><span class="fill" style="width:${p.probabilitas * 100}%"></span></span>
+        <span class="num">${pct(p.probabilitas)}</span></li>`).join("")}</ul>
+    <div class="meta"><img src="${d.citra_diproses}" alt="Citra setelah preprocessing">
+      <div>Citra setelah preprocessing (224×224)<br>Model ${d.model} · ${d.waktu_ms} ms</div></div>`;
+}
+
+fetch("api/info").then(r => r.json()).then(i => {
+  const acc = i.akurasi_uji != null ? ` · akurasi uji ${(i.akurasi_uji * 100).toFixed(1)}%` : "";
+  $("#foot").textContent = `Model ${i.model} (${i.nama}${i.glcm ? ", dengan fitur GLCM" : ""}) · ${i.jumlah_kelas} kelas${acc}`;
+}).catch(() => $("#foot").textContent = "Backend tidak dapat dihubungi.");
+</script>
+</body>
+</html>
