@@ -1,0 +1,24 @@
+a,split_a,b,split_b,korelasi,lintas_split,beda_label
+o/o_o_ (951).jpg,train,o/o_o_ (95).jpg,train,0.9519,False,False
+sa/sa_sa_6.jpg,train,sa/sa_sa_7.jpg,train,0.9976,False,False
+eu/eu_eu_411.jpg,train,eu/eu_eu_41.jpg,val,0.9775,True,False
+ya/ya_ya_83.jpg,train,ya/ya_ya_72.jpg,train,0.9979,False,False
+ka/ka_ka_83.jpg,train,ka/ka_ka_72.jpg,train,0.9985,False,False
+ra/ra_ra_7.jpg,train,ra/ra_ra_6.jpg,test,0.9993,True,False
+i/i_i_115.jpg,train,i/i_i_1151.jpg,train,1.0,False,False
+ta/ta_ta_83.jpg,train,ta/ta_ta_72.jpg,val,0.9965,True,False
+da/da_da_83.jpg,train,da/da_da_72.jpg,train,0.9894,False,False
+ka/ka_ka_7.jpg,train,ka/ka_ka_6.jpg,train,0.9933,False,False
+i/IMG_20241124_215112.jpg,train,i/IMG_20241124_142355.jpg,train,0.9528,False,False
+ka/ka_ka_110.jpg,train,ka/ka_ka_109.jpg,train,0.9867,False,False
+eu/eu_eu_391.jpg,train,eu/eu_eu_39.jpg,val,0.9925,True,False
+eu/eu_eu_45.jpg,train,eu/eu_eu_451.jpg,train,0.9558,False,False
+ga/ga_ga_7.jpg,train,ga/ga_ga_6.jpg,test,0.9952,True,False
+ca/ca_ca_110.jpg,train,ca/ca_ca_109.jpg,train,0.9938,False,False
+ya/ya_ya_110.jpg,train,ya/ya_ya_109.jpg,train,0.9962,False,False
+i/i_i_93.jpg,train,i/i_i_931.jpg,val,0.9904,True,False
+ca/ca_ca_72.jpg,train,ca/ca_ca_83.jpg,train,0.9896,False,False
+ra/ra_ra_110.jpg,train,ra/ra_ra_109.jpg,train,0.9842,False,False
+ba/ba_ba_72.jpg,train,ba/ba_ba_83.jpg,train,0.9891,False,False
+pa/pa_pa_72.jpg,val,pa/pa_pa_83.jpg,test,0.9983,True,False
+ja/ja_ja_83.jpg,test,ja/ja_ja_72.jpg,test,0.9905,False,False

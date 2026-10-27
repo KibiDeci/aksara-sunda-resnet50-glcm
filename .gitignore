@@ -1,6 +1,3 @@
-# Dataset (unduh dari Kaggle, jangan di-commit)
-dataset_gabung_fix/
-
 # Hasil yang bisa dibuat ulang / terlalu besar
 preprocessing_output/preprocessed_224.npz
 hasil_M*/best.keras

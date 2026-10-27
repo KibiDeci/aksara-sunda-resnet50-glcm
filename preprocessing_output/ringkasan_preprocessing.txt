@@ -1,0 +1,14 @@
+RINGKASAN PREPROCESSING
+- Split awal (EDA)         : 1,259 / 270 / 270 (train/val/test, stratified kelas+sumber)
+- Pasangan hampir-duplikat : 23 (r >= 0.95; lintas split: 7; beda label: 0)
+- Citra dibuang (duplikat) : 23 (train 15, val 4, test 4)
+- Split akhir              : 1,244 / 266 / 266 = 1,776 citra, 30 kelas
+- Citra latih per kelas    : min 39, maks 42
+- Ukuran keluaran          : 224x224; grayscale untuk GLCM, disalin ke 3 kanal untuk CNN
+- Crop karakter berhasil   : 1,776 / 1,776 (margin 15%)
+- Area karakter < 224px    : 593 citra (di-upscale)
+- Latar gelap dibalik      : 0
+- Normalisasi CNN          : ResNet50 = caffe (BGR - mean ImageNet); MobileNetV2 = skala [-1, 1]
+- Fitur GLCM per citra     : 32 (levels=32, d=[1, 2], sudut=[0, 45, 90, 135])
+- Scaler GLCM di-fit pada  : data latih saja (1,244 citra)
+- Augmentasi (train saja)  : rotasi +-10 deg, zoom (0.9, 1.05), shift +-5%, noise std 0.0, tanpa flip

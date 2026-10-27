@@ -1,0 +1,24 @@
+relpath,label,source,split
+o/o_o_ (95).jpg,o,lainnya,train
+sa/sa_sa_7.jpg,sa,lainnya,train
+eu/eu_eu_41.jpg,eu,lainnya,val
+ya/ya_ya_72.jpg,ya,lainnya,train
+ka/ka_ka_72.jpg,ka,lainnya,train
+ra/ra_ra_6.jpg,ra,lainnya,test
+i/i_i_1151.jpg,i,lainnya,train
+ta/ta_ta_72.jpg,ta,lainnya,val
+da/da_da_72.jpg,da,lainnya,train
+ka/ka_ka_6.jpg,ka,lainnya,train
+i/IMG_20241124_142355.jpg,i,kamera,train
+ka/ka_ka_109.jpg,ka,lainnya,train
+eu/eu_eu_39.jpg,eu,lainnya,val
+eu/eu_eu_451.jpg,eu,lainnya,train
+ga/ga_ga_6.jpg,ga,lainnya,test
+ca/ca_ca_109.jpg,ca,lainnya,train
+ya/ya_ya_109.jpg,ya,lainnya,train
+i/i_i_931.jpg,i,lainnya,val
+ca/ca_ca_83.jpg,ca,lainnya,train
+ra/ra_ra_109.jpg,ra,lainnya,train
+ba/ba_ba_83.jpg,ba,lainnya,train
+pa/pa_pa_83.jpg,pa,lainnya,test
+ja/ja_ja_72.jpg,ja,lainnya,test
