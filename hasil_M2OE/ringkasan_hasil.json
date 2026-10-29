@@ -1,0 +1,41 @@
+{
+ "model": "M2OE",
+ "nama": "ResNet50-GLCM + Outlier Exposure",
+ "arsitektur": "resnet50",
+ "glcm": true,
+ "dilanjutkan_dari": "M2",
+ "akurasi_uji": 0.9925,
+ "f1_macro": 0.9926,
+ "jumlah_coretan": {
+  "train": 1500,
+  "val": 300,
+  "test": 300
+ },
+ "evaluasi_ood": {
+  "model": "M2-OE",
+  "akurasi_uji_aksara": 0.9925,
+  "f1_macro_uji_aksara": 0.9926,
+  "ambang_probabilitas": 0.8177,
+  "aksara_uji_diterima": 0.9586,
+  "coretan_uji_ditolak": 1.0,
+  "auroc": 1.0,
+  "rerata_prob_tertinggi_aksara": 0.977,
+  "rerata_prob_tertinggi_coretan": 0.0474
+ },
+ "epoch_total": 20,
+ "epoch_tahap1": 10,
+ "waktu_latih_menit": 7.7,
+ "seed": 42,
+ "parameter": {
+  "lambda_oe": 0.5,
+  "batch_aksara": 32,
+  "batch_coretan": 32,
+  "lr_tahap1": 0.0001,
+  "lr_tahap2": 1e-05,
+  "epochs_tahap1": 10,
+  "epochs_tahap2": 10,
+  "unfreeze_last": 30,
+  "patience": 3,
+  "persentil_ambang": 5
+ }
+}

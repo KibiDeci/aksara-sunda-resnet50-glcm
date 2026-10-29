@@ -1,0 +1,5 @@
+perbandingan,keterangan,salah_a,salah_b,p_min,p_max,kesimpulan
+M2 vs M1,GLCM pada ResNet50 (analisis utama),4,4,1.0,1.0,tidak signifikan pada semua kemungkinan
+M4 vs M3,GLCM pada MobileNetV2,3,7,0.125,0.3438,tidak signifikan pada semua kemungkinan
+M1 vs M3,ResNet50 vs MobileNetV2,4,7,0.25,0.5488,tidak signifikan pada semua kemungkinan
+M2 vs M4,ResNet50-GLCM vs MobileNetV2-GLCM,4,3,1.0,1.0,tidak signifikan pada semua kemungkinan

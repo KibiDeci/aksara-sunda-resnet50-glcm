@@ -1,0 +1,53 @@
+{
+ "model": "M1",
+ "nama": "ResNet50",
+ "arsitektur": "resnet50",
+ "glcm": false,
+ "akurasi_uji": 0.985,
+ "precision_macro": 0.9867,
+ "recall_macro": 0.9847,
+ "f1_macro": 0.9849,
+ "jumlah_data_uji": 266,
+ "epoch_total": 58,
+ "epoch_tahap1": 30,
+ "epoch_terbaik": 53,
+ "val_loss_terbaik": 0.0806,
+ "val_akurasi_pada_epoch_terbaik": 0.9774,
+ "waktu_latih_menit": 8.4,
+ "waktu_inferensi_ms_per_citra": 31.58,
+ "jumlah_parameter": 24119966,
+ "pasangan_kelas_tertukar_terbanyak": [
+  [
+   "ae",
+   "a",
+   1
+  ],
+  [
+   "ga",
+   "na",
+   1
+  ],
+  [
+   "la",
+   "va",
+   1
+  ],
+  [
+   "ma",
+   "fa",
+   1
+  ]
+ ],
+ "seed": 42,
+ "parameter": {
+  "dense_units": 256,
+  "dropout": 0.5,
+  "lr_stage1": 0.001,
+  "lr_stage2": 1e-05,
+  "epochs_stage1": 30,
+  "epochs_stage2": 30,
+  "unfreeze_last": 30,
+  "patience": 5,
+  "batch_size": 32
+ }
+}

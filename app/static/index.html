@@ -54,6 +54,8 @@
   .warn { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft);
           color: var(--warn); font-size: 13px; }
   .list { margin: 16px 0 0; padding: 0; list-style: none; }
+  .list.dim { opacity: .45; }
+  .top .glyph.unknown { font-family: var(--sans); font-size: 64px; color: var(--warn); background: var(--warn-soft); }
   .list li { display: grid; grid-template-columns: 34px 70px 1fr 54px; align-items: center; gap: 8px;
              padding: 5px 0; font-size: 14px; }
   .list .g { font-family: var(--sunda); font-size: 22px; text-align: center; }
@@ -187,20 +189,23 @@ function showError(msg) { $("#result").innerHTML = `<div class="empty err">${msg
 const pct = p => (p * 100).toFixed(1) + "%";
 function render(d) {
   const [best, ...rest] = d.prediksi;
-  const low = best.probabilitas < 0.5;
+  const asing = d.dikenali === false;
+  const low = !asing && best.probabilitas < 0.5;
+  const ambang = d.ambang != null ? ` · ambang ${pct(d.ambang)}` : "";
   $("#result").innerHTML = `
     <div class="top">
-      <div class="glyph">${best.aksara}</div>
-      <div><div class="name">${best.baca}</div>
+      <div class="glyph${asing ? " unknown" : ""}">${asing ? "?" : best.aksara}</div>
+      <div><div class="name">${asing ? "Tidak dikenali" : best.baca}</div>
         <div class="conf">Keyakinan model ${pct(best.probabilitas)}</div></div>
     </div>
+    ${asing ? '<div class="warn">Semua persentase rendah: tulisan ini tidak mirip aksara mana pun yang dipelajari model. Pastikan menulis satu aksara Sunda dasar dengan bentuk standar, tanpa rarangkén.</div>' : ""}
     ${low ? '<div class="warn">Keyakinan rendah. Coba tulis ulang lebih jelas, atau gunakan foto dengan latar polos.</div>' : ""}
-    <ul class="list">${d.prediksi.map(p => `
+    <ul class="list${asing ? " dim" : ""}">${d.prediksi.map(p => `
       <li><span class="g">${p.aksara}</span><span>${p.baca}</span>
         <span class="track"><span class="fill" style="width:${p.probabilitas * 100}%"></span></span>
         <span class="num">${pct(p.probabilitas)}</span></li>`).join("")}</ul>
     <div class="meta"><img src="${d.citra_diproses}" alt="Citra setelah preprocessing">
-      <div>Citra setelah preprocessing (224×224)<br>Model ${d.model} · ${d.waktu_ms} ms</div></div>`;
+      <div>Citra setelah preprocessing (224×224)<br>Model ${d.model} · ${d.waktu_ms} ms${ambang}</div></div>`;
 }
 
 fetch("api/info").then(r => r.json()).then(i => {

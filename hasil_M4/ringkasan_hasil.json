@@ -1,0 +1,48 @@
+{
+ "model": "M4",
+ "nama": "MobileNetV2-GLCM",
+ "arsitektur": "mobilenetv2",
+ "glcm": true,
+ "akurasi_uji": 0.9887,
+ "precision_macro": 0.9896,
+ "recall_macro": 0.9889,
+ "f1_macro": 0.9889,
+ "jumlah_data_uji": 266,
+ "epoch_total": 36,
+ "epoch_tahap1": 30,
+ "epoch_terbaik": 31,
+ "val_loss_terbaik": 0.1176,
+ "val_akurasi_pada_epoch_terbaik": 0.9662,
+ "waktu_latih_menit": 5.1,
+ "waktu_inferensi_ms_per_citra": 32.45,
+ "jumlah_parameter": 2601822,
+ "pasangan_kelas_tertukar_terbanyak": [
+  [
+   "a",
+   "ae",
+   1
+  ],
+  [
+   "ae",
+   "eu",
+   1
+  ],
+  [
+   "ha",
+   "za",
+   1
+  ]
+ ],
+ "seed": 42,
+ "parameter": {
+  "dense_units": 256,
+  "dropout": 0.5,
+  "lr_stage1": 0.001,
+  "lr_stage2": 1e-05,
+  "epochs_stage1": 30,
+  "epochs_stage2": 30,
+  "unfreeze_last": 30,
+  "patience": 5,
+  "batch_size": 32
+ }
+}

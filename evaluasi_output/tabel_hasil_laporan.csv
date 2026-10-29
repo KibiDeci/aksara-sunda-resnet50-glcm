@@ -1,0 +1,5 @@
+Model,Validasi akurasi,Uji internal akurasi,Uji internal macro-F1,Uji eksternal akurasi,Uji eksternal macro-F1
+M1 ResNet50,97.74%,98.50%,98.49%,belum diuji,belum diuji
+M2 ResNet50-GLCM,98.50%,98.50%,98.52%,belum diuji,belum diuji
+M3 MobileNetV2,95.11%,97.37%,97.35%,belum diuji,belum diuji
+M4 MobileNetV2-GLCM,96.62%,98.87%,98.89%,belum diuji,belum diuji

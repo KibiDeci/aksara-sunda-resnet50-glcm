@@ -4,6 +4,7 @@ hasil_M*/best.keras
 *.keras
 *.h5
 evaluasi_output/prediksi_uji_*.csv
+outlier/*.npz
 
 # Python
 __pycache__/

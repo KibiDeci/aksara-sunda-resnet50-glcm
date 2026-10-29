@@ -1,0 +1,58 @@
+{
+ "model": "M3",
+ "nama": "MobileNetV2",
+ "arsitektur": "mobilenetv2",
+ "glcm": false,
+ "akurasi_uji": 0.9737,
+ "precision_macro": 0.9776,
+ "recall_macro": 0.9736,
+ "f1_macro": 0.9735,
+ "jumlah_data_uji": 266,
+ "epoch_total": 36,
+ "epoch_tahap1": 30,
+ "epoch_terbaik": 26,
+ "val_loss_terbaik": 0.155,
+ "val_akurasi_pada_epoch_terbaik": 0.9511,
+ "waktu_latih_menit": 3.5,
+ "waktu_inferensi_ms_per_citra": 27.5,
+ "jumlah_parameter": 2593630,
+ "pasangan_kelas_tertukar_terbanyak": [
+  [
+   "a",
+   "ae",
+   3
+  ],
+  [
+   "ae",
+   "eu",
+   1
+  ],
+  [
+   "ga",
+   "wa",
+   1
+  ],
+  [
+   "la",
+   "va",
+   1
+  ],
+  [
+   "nga",
+   "na",
+   1
+  ]
+ ],
+ "seed": 42,
+ "parameter": {
+  "dense_units": 256,
+  "dropout": 0.5,
+  "lr_stage1": 0.001,
+  "lr_stage2": 1e-05,
+  "epochs_stage1": 30,
+  "epochs_stage2": 30,
+  "unfreeze_last": 30,
+  "patience": 5,
+  "batch_size": 32
+ }
+}

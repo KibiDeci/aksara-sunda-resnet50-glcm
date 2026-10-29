@@ -1,0 +1,53 @@
+{
+ "model": "M2",
+ "nama": "ResNet50-GLCM",
+ "arsitektur": "resnet50",
+ "glcm": true,
+ "akurasi_uji": 0.985,
+ "precision_macro": 0.9859,
+ "recall_macro": 0.9852,
+ "f1_macro": 0.9852,
+ "jumlah_data_uji": 266,
+ "epoch_total": 58,
+ "epoch_tahap1": 30,
+ "epoch_terbaik": 53,
+ "val_loss_terbaik": 0.0666,
+ "val_akurasi_pada_epoch_terbaik": 0.985,
+ "waktu_latih_menit": 10.1,
+ "waktu_inferensi_ms_per_citra": 35.83,
+ "jumlah_parameter": 24128158,
+ "pasangan_kelas_tertukar_terbanyak": [
+  [
+   "a",
+   "ae",
+   1
+  ],
+  [
+   "ae",
+   "a",
+   1
+  ],
+  [
+   "ka",
+   "qa",
+   1
+  ],
+  [
+   "ta",
+   "ya",
+   1
+  ]
+ ],
+ "seed": 42,
+ "parameter": {
+  "dense_units": 256,
+  "dropout": 0.5,
+  "lr_stage1": 0.001,
+  "lr_stage2": 1e-05,
+  "epochs_stage1": 30,
+  "epochs_stage2": 30,
+  "unfreeze_last": 30,
+  "patience": 5,
+  "batch_size": 32
+ }
+}

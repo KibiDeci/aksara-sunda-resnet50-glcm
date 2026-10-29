@@ -1,13 +1,17 @@
 """Backend aplikasi pengenalan Aksara Sunda (FastAPI).
 
 Jalankan dari folder proyek (sejajar dengan config.py):
-    uvicorn app.main:app --port 8000            # memakai model M2 (default)
-    set MODEL=M1 && uvicorn app.main:app        # Windows CMD: pilih model lain
-    $env:MODEL="M1"; uvicorn app.main:app       # Windows PowerShell
+    python app/main.py                          # M2OE jika ada, selain itu M2
+    set MODEL=M1 && python app/main.py          # Windows CMD: pilih model lain
+    $env:MODEL="M1"; python app/main.py         # Windows PowerShell
 Lalu buka http://localhost:8000
 
 Backend memakai modul preprocessing, GLCM, dan normalisasi yang SAMA dengan
 pelatihan, sehingga citra dari pengguna diproses persis seperti data latih.
+
+Model M2OE (train_oe.py) dilatih dengan coretan non-aksara sehingga memberi
+persentase rendah untuk masukan yang bukan aksara. Jika probabilitas tertinggi
+di bawah ambang (hasil_M2OE/ambang_ood.json), hasil ditandai "tidak dikenali".
 """
 import base64
 import io
@@ -33,10 +37,12 @@ import config as C
 from glcm_features import glcm_features
 from preprocessing import gray_to_rgb, normalize_for, preprocess_gray
 
-MODEL_NAME = os.environ.get("MODEL", "M2")
+DEFAULT = "M2OE" if (ROOT / "hasil_M2OE" / "best.keras").exists() else "M2"
+MODEL_NAME = os.environ.get("MODEL", DEFAULT)
 MODEL_DIR = ROOT / f"hasil_{MODEL_NAME}"
 MODELS = {"M1": ("resnet50", False), "M2": ("resnet50", True),
-          "M3": ("mobilenetv2", False), "M4": ("mobilenetv2", True)}
+          "M3": ("mobilenetv2", False), "M4": ("mobilenetv2", True),
+          "M2OE": ("resnet50", True)}
 MAX_BYTES = 5 * 1024 * 1024
 TOP_K = 5
 
@@ -59,13 +65,16 @@ async def lifespan(app):
         raise RuntimeError(f"MODEL harus salah satu dari {list(MODELS)}")
     ckpt = MODEL_DIR / "best.keras"
     if not ckpt.exists():
-        raise RuntimeError(f"{ckpt} tidak ditemukan. Latih dulu: python train_model.py --model {MODEL_NAME}")
+        cmd = "python train_oe.py" if MODEL_NAME == "M2OE" else f"python train_model.py --model {MODEL_NAME}"
+        raise RuntimeError(f"{ckpt} tidak ditemukan. Latih dulu: {cmd}")
     S["arch"], S["glcm"] = MODELS[MODEL_NAME]
-    S["model"] = keras.models.load_model(ckpt)
+    S["model"] = keras.models.load_model(ckpt, compile=False)
     S["classes"] = json.load(open(C.OUT_DIR / "class_names.json"))
     S["scaler"] = joblib.load(C.OUT_DIR / "scaler_glcm.joblib") if S["glcm"] else None
     rh = MODEL_DIR / "ringkasan_hasil.json"
     S["ringkasan"] = json.load(open(rh)) if rh.exists() else {}
+    amb = MODEL_DIR / "ambang_ood.json"
+    S["ambang"] = json.load(open(amb))["ambang"] if amb.exists() else None
     _predict(np.full((C.IMG_SIZE, C.IMG_SIZE), 255, np.uint8))   # pemanasan
     print(f"Model {MODEL_NAME} ({S['arch']}, GLCM={S['glcm']}) siap.")
     yield
@@ -115,6 +124,8 @@ async def predict(file: UploadFile = File(...)):
     top = np.argsort(prob)[::-1][:TOP_K]
     ok, png = cv2.imencode(".png", gray)
     return {
+        "dikenali": True if S["ambang"] is None else bool(prob.max() >= S["ambang"]),
+        "ambang": S["ambang"],
         "prediksi": [{"label": S["classes"][i], "aksara": AKSARA.get(S["classes"][i], ""),
                       "baca": BACA.get(S["classes"][i], S["classes"][i]),
                       "probabilitas": round(float(prob[i]), 4)} for i in top],
