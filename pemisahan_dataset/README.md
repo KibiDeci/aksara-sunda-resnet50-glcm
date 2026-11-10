@@ -16,7 +16,11 @@ python pemisahan_dataset/split_dataset_manual.py
 ### Opsi 2: Menjalankan Notebook (`.ipynb`)
 Buka `pemisahan_dataset/pemisahan_dataset.ipynb` di VS Code / Jupyter Lab, lalu jalankan semua sel secara berurutan.
 
-Opsi script: `--input`, `--output`, dan `--keep` (jangan hapus output lama). Tanpa `--keep`, folder output dihapus dulu agar penomoran tidak dobel.
+Opsi script: `--input` (bawaan `foto_formulir/`) dan `--output` (bawaan `dataset/`).
+
+Hasil digabung dengan citra yang sudah ada di `dataset/`. Setiap dijalankan, hanya berkas berawalan `form_` yang dihapus lalu dibuat ulang, sehingga penomoran tidak dobel dan citra lain di `dataset/` tidak tersentuh.
+
+Setelah itu jalankan ulang pipeline mulai dari `python EDA.py` agar citra formulir masuk ke pembagian latih/validasi/uji.
 
 ## Format Input
 * `foto_formulir/<kelas>/<foto>.jpg|jpeg|png`, nama subfolder = nama kelas (`a`, `i`, `sa`, `xa`, ...).
@@ -28,4 +32,5 @@ Opsi script: `--input`, `--output`, dan `--keep` (jangan hapus output lama). Tan
 2. Tabel dideteksi lalu diluruskan (perspective transform).
 3. Batas tiap kotak dicari lokal, sehingga kertas melengkung tetap terpotong pas.
 4. Sisa garis tabel dibuang; hanya goresan aksara yang ditempel di kanvas putih `224x224` dengan padding.
-5. Hasil disimpan ke `dataset_tulisan_tangan/<kelas>/<kelas>_<nnn>.jpg`. Kotak kosong dilaporkan di output terminal.
+5. Hasil disimpan ke `dataset/<kelas>/form_<kelas>_<nnn>.jpg`. Kotak kosong dilaporkan di output terminal.
+6. `EDA.py` mengenali awalan `form_` sebagai sumber `formulir`, sehingga pembagian data distratifikasi per kelas dan sumber, dan `evaluasi.py` melaporkan akurasi khusus citra formulir.

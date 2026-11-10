@@ -8,15 +8,19 @@ Setiap foto lembar berisi tabel 8 kolom x 10 baris (80 aksara). Program:
 4. Memotong aksara, membuang sisa garis, menaruh di kanvas putih 224x224.
 
 Struktur input : foto_formulir/<kelas>/<foto>.jpg|jpeg|png
-Struktur output: dataset_tulisan_tangan/<kelas>/<kelas>_<nnn>.jpg
+Struktur output: dataset/<kelas>/form_<kelas>_<nnn>.jpg
+
+Hasil digabung ke folder dataset yang sudah berisi citra lain. Awalan "form_"
+menandai citra hasil formulir: saat dijalankan ulang, hanya berkas form_* yang
+dihapus dan dibuat ulang; citra lain di dataset tidak disentuh.
 """
 from pathlib import Path
 import argparse
-import shutil
 
 import cv2
 import numpy as np
 
+PREFIX = "form_"
 ROWS, COLS = 10, 8
 CELL = 120                      # ukuran kotak setelah tabel diluruskan (px)
 SEARCH = 30                     # jendela pencarian garis lokal (px)
@@ -170,14 +174,23 @@ def split_sheet(img_bgr, inset=4):
     return out, empty
 
 
-def process_dataset(input_dir, output_dir, clean=True):
+def remove_old_form_images(output_dir):
+    """Hapus hasil formulir sebelumnya (hanya berkas form_*) agar penomoran tidak dobel."""
+    old = list(Path(output_dir).glob(f"*/{PREFIX}*"))
+    for p in old:
+        p.unlink()
+    return len(old)
+
+
+def process_dataset(input_dir, output_dir):
     input_dir, output_dir = Path(input_dir), Path(output_dir)
-    if clean and output_dir.exists():
-        shutil.rmtree(output_dir)
     files = sorted(p for p in input_dir.rglob("*") if p.suffix.lower() in EXTS)
     if not files:
         print(f"Tidak ada citra di '{input_dir}'.")
         return
+    removed = remove_old_form_images(output_dir)
+    if removed:
+        print(f"Menghapus {removed} citra formulir lama ({PREFIX}*) di '{output_dir}'.")
     print(f"Ditemukan {len(files)} lembar.")
 
     counter = {}
@@ -196,7 +209,7 @@ def process_dataset(input_dir, output_dir, clean=True):
         target.mkdir(parents=True, exist_ok=True)
         for ch in chars:
             counter[cls] = counter.get(cls, 0) + 1
-            cv2.imwrite(str(target / f"{cls}_{counter[cls]:03d}.jpg"), ch)
+            cv2.imwrite(str(target / f"{PREFIX}{cls}_{counter[cls]:03d}.jpg"), ch)
         note = f" ({empty} kotak kosong)" if empty else ""
         print(f"[{i}/{len(files)}] {cls}/{f.name} -> {len(chars)} aksara{note}")
 
@@ -209,7 +222,6 @@ if __name__ == "__main__":
     root = Path(__file__).resolve().parent.parent
     ap = argparse.ArgumentParser(description="Pisahkan foto formulir menjadi citra per aksara.")
     ap.add_argument("--input", default=root / "foto_formulir")
-    ap.add_argument("--output", default=root / "dataset_tulisan_tangan")
-    ap.add_argument("--keep", action="store_true", help="jangan hapus folder output lama")
+    ap.add_argument("--output", default=root / "dataset")
     a = ap.parse_args()
-    process_dataset(a.input, a.output, clean=not a.keep)
+    process_dataset(a.input, a.output)

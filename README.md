@@ -166,9 +166,12 @@ Jalankan dari folder proyek (sejajar dengan `config.py`), berurutan dari atas ke
 | 9 | `python train_oe.py` | `hasil_M2OE/` (model M2-OE dan ambang "Tidak dikenali") | `hasil_M2/best.keras`, `outlier/` |
 | 10 | `python uji_eksternal.py` | `uji_eksternal_output/` (opsional) | folder `uji_eksternal/`, minimal satu `hasil_Mx/best.keras` |
 
+Jika ada foto formulir tulisan tangan di `foto_formulir/`, jalankan dulu pemisahannya (langkah 6) sebelum `EDA.py`, agar citranya ikut masuk ke pembagian data.
+
 Ringkasnya:
 
 ```bash
+python pemisahan_dataset/split_dataset_manual.py   # opsional, jika ada foto_formulir/
 python EDA.py
 python run_preprocessing.py
 python train_model.py --model M1
@@ -185,7 +188,7 @@ Catatan:
 
 - Pelatihan empat model paling lama; di GPU sekitar puluhan menit per model, di CPU bisa beberapa jam.
 - Hasil pelatihan di GPU sedikit berbeda setiap kali diulang walaupun memakai `SEED = 42`, sehingga angka akurasi bisa berbeda tipis dari tabel di bagian Hasil.
-- `EDA.py` membagi ulang data dari folder `dataset/` (1.799 citra, karena satu duplikat sudah dibuang). Pembagian ini bisa berbeda dari pembagian yang dipakai di laporan (dibuat dari 1.800 citra).
+- `EDA.py` membagi ulang data dari folder `dataset/` (1.799 citra Kaggle, karena satu duplikat sudah dibuang, ditambah citra formulir bila ada). Pembagian ini bisa berbeda dari pembagian yang dipakai di laporan (dibuat dari 1.800 citra Kaggle).
 - `uji_eksternal.py` butuh folder `uji_eksternal/` berisi tulisan tangan penulis baru, dengan 30 subfolder kelas dan nama berkas diawali nama penulis (misal `budi_a.jpg`). Format lengkap ada di docstring `uji_eksternal.py`. Data ini hanya untuk evaluasi akhir, jangan dipakai untuk pelatihan.
 
 ### 4. Menjalankan via Jupyter Notebook di VS Code
@@ -212,9 +215,9 @@ python app/main.py
 
 Buka `http://localhost:8000` di browser.
 
-### 6. Dataset tulisan tangan dari formulir (opsional)
+### 6. Menambah dataset dari formulir tulisan tangan (opsional)
 
-Folder `pemisahan_dataset/` berisi alat untuk memotong foto formulir tulisan tangan (tabel 8 kolom x 10 baris = 80 aksara per lembar) menjadi satu citra per aksara berukuran 224 x 224.
+Folder `pemisahan_dataset/` berisi alat untuk memotong foto formulir tulisan tangan (tabel 8 kolom x 10 baris = 80 aksara per lembar) menjadi satu citra per aksara berukuran 224 x 224, lalu menambahkannya ke folder `dataset/`.
 
 Susun foto formulir seperti ini (nama subfolder = nama kelas, sama dengan `dataset/`; nama berkas bebas):
 
@@ -233,7 +236,9 @@ Lalu jalankan:
 python pemisahan_dataset/split_dataset_manual.py
 ```
 
-Hasil ada di `dataset_tulisan_tangan/<kelas>/<kelas>_001.jpg`, dst. Foto boleh portrait atau landscape dan sedikit miring; orientasi dan kelengkungan kertas ditangani otomatis. Versi notebook dengan preview: `pemisahan_dataset/pemisahan_dataset.ipynb`. Rincian di [pemisahan_dataset/README.md](pemisahan_dataset/README.md).
+Hasil ditambahkan ke `dataset/<kelas>/form_<kelas>_001.jpg`, dst., berdampingan dengan citra Kaggle. Setiap dijalankan, hanya berkas `form_*` yang dihapus dan dibuat ulang; citra Kaggle tidak tersentuh. `EDA.py` mengenali awalan `form_` sebagai sumber `formulir`, sehingga citra formulir terbagi rata ke data latih, validasi, dan uji, dan `evaluasi.py` melaporkan akurasinya secara terpisah. Setelah pemisahan, jalankan ulang pipeline mulai dari `python EDA.py`.
+
+Foto boleh portrait atau landscape dan sedikit miring; orientasi dan kelengkungan kertas ditangani otomatis. Versi notebook dengan preview: `pemisahan_dataset/pemisahan_dataset.ipynb`. Rincian di [pemisahan_dataset/README.md](pemisahan_dataset/README.md).
 
 ## Folder hasil
 
@@ -248,10 +253,9 @@ Semua folder berikut dibuat oleh script dan aman dihapus. Untuk membuatnya lagi,
 | `outlier/` | `buat_outlier.py` |
 | `hasil_M2OE/` | `train_oe.py` |
 | `uji_eksternal_output/` | `uji_eksternal.py` |
-| `dataset_tulisan_tangan/` | `pemisahan_dataset/split_dataset_manual.py` |
 | `__pycache__/` | Python (otomatis) |
 
-Jangan hapus `dataset/`, `foto_formulir/`, dan `uji_eksternal/`; ketiganya data mentah yang tidak bisa dibuat ulang.
+Jangan hapus `dataset/`, `foto_formulir/`, dan `uji_eksternal/`; ketiganya data mentah yang tidak bisa dibuat ulang. Pengecualian: berkas `dataset/<kelas>/form_*` dibuat oleh `pemisahan_dataset/split_dataset_manual.py` dan bisa dibuat ulang dari `foto_formulir/`.
 
 ## Model terlatih
 
@@ -274,7 +278,7 @@ File model `best.keras` tidak disimpan di repositori karena ukurannya melebihi b
 | `glcm_features.py` | Ekstraksi 32 fitur GLCM |
 | `data_loader.py` | Penyedia batch data untuk Keras |
 | `app/` | Aplikasi web (FastAPI + HTML/JavaScript) |
-| `dataset/` | Dataset citra (30 subfolder kelas) |
+| `dataset/` | Dataset citra (30 subfolder kelas): citra Kaggle dan potongan formulir `form_*` |
 | `foto_formulir/` | Foto formulir tulisan tangan mentah, per subfolder kelas |
 | `pemisahan_dataset/` | Pemotong foto formulir menjadi citra per aksara (script dan notebook) |
 | `notebooks/` | Jupyter Notebook untuk VS Code |

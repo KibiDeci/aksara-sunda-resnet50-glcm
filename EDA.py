@@ -53,8 +53,16 @@ for p in df.path:
     props.append(d)
 df = pd.concat([df, pd.DataFrame(props)], axis=1)
 df["aspect"] = df.width / df.height
-# Sumber gambar dari pola nama file (sesuaikan bila dataset lain): foto kamera HP = "IMG_..."
-df["source"] = df.path.map(lambda p: "kamera" if Path(p).name.startswith("IMG_") else "lainnya")
+# Sumber gambar dari pola nama file (sesuaikan bila dataset lain): foto kamera HP = "IMG_...",
+# potongan formulir tulisan tangan (pemisahan_dataset/) = "form_..."
+def sumber(p):
+    name = Path(p).name
+    if name.startswith("IMG_"):
+        return "kamera"
+    if name.startswith("form_"):
+        return "formulir"
+    return "lainnya"
+df["source"] = df.path.map(sumber)
 df.to_csv(OUT_DIR / "metadata_raw.csv", index=False)
 
 # 3. Ringkasan kualitas data

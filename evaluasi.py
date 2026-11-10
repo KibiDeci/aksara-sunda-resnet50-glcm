@@ -82,12 +82,15 @@ def main():
         p, r, f, _ = precision_recall_fscore_support(y, yhat, labels=labels, average="macro", zero_division=0)
         ring = C.BASE_DIR / f"hasil_{m}" / "ringkasan_hasil.json"
         rj = json.load(open(ring)) if ring.exists() else {}
-        kamera = (test_df.source == "kamera").to_numpy()
+        src = test_df.source.to_numpy()
+        benar = y == yhat
+        akurasi_sumber = lambda s: float(benar[src == s].mean()) if (src == s).any() else float("nan")
         rows.append({"model": m, "nama": nama, "benar": k, "salah": n - k, "n_uji": n,
                      "akurasi": k / n, "ik95_bawah": lo, "ik95_atas": hi,
                      "precision_makro": p, "recall_makro": r, "f1_makro": f,
-                     "akurasi_foto_kamera": float((y == yhat)[kamera].mean()),
-                     "akurasi_sumber_lain": float((y == yhat)[~kamera].mean()),
+                     "akurasi_foto_kamera": akurasi_sumber("kamera"),
+                     "akurasi_sumber_lain": akurasi_sumber("lainnya"),
+                     "akurasi_formulir": akurasi_sumber("formulir"),
                      "epoch_terbaik": rj.get("epoch_terbaik"), "waktu_latih_menit": rj.get("waktu_latih_menit"),
                      "inferensi_ms_per_citra": rj.get("waktu_inferensi_ms_per_citra"),
                      "jumlah_parameter": rj.get("jumlah_parameter")})
@@ -144,7 +147,8 @@ def main():
     for _, r in tab.iterrows():
         lines.append(f"{r.model} {r.nama:17s}: akurasi {r.akurasi*100:.2f}% (IK95 {r.ik95_bawah*100:.1f}-"
                      f"{r.ik95_atas*100:.1f}%), F1 makro {r.f1_makro*100:.2f}%, salah {r.salah}/{r.n_uji}, "
-                     f"kamera {r.akurasi_foto_kamera*100:.1f}% / lainnya {r.akurasi_sumber_lain*100:.1f}%")
+                     f"kamera {r.akurasi_foto_kamera*100:.1f}% / lainnya {r.akurasi_sumber_lain*100:.1f}%"
+                     + (f" / formulir {r.akurasi_formulir*100:.1f}%" if r.akurasi_formulir == r.akurasi_formulir else ""))
     if len(mc):
         lines += ["", "Uji McNemar (eksak):"]
         for _, r in mc.iterrows():
