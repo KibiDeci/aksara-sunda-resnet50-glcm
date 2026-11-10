@@ -1,12 +1,8 @@
-"""Konfigurasi bersama preprocessing, augmentasi, dan GLCM.
-
-Letakkan semua file .py ini di folder yang sama dengan `dataset_gabung_fix/`
-dan `eda_output/` (mis. D:\\Kelompok Machine Learning\\).
-"""
+"""Konfigurasi bersama preprocessing, augmentasi, dan GLCM."""
 from pathlib import Path
 
 BASE_DIR    = Path(__file__).resolve().parent
-DATASET_DIR = BASE_DIR / "dataset_gabung_fix"
+DATASET_DIR = BASE_DIR / "dataset"
 EDA_DIR     = BASE_DIR / "eda_output"            # split_train/val/test.csv dari EDA.py
 OUT_DIR     = BASE_DIR / "preprocessing_output"
 

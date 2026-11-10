@@ -121,9 +121,14 @@ def normalize_for(arch: str, rgb: np.ndarray) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
-# Utilitas path (CSV split dari EDA berisi path absolut Windows D:\...)
+# Utilitas path (mendukung path relatif maupun path absolut lintas OS)
 # ---------------------------------------------------------------------------
 def to_local_path(p: str) -> Path:
-    """'D:\\...\\dataset_gabung_fix\\ka\\x.jpg' -> DATASET_DIR/ka/x.jpg (lintas OS)."""
-    parts = PureWindowsPath(p).parts if "\\" in p else Path(p).parts
+    """Konversi path citra (relatif atau absolut) ke Path lokal di DATASET_DIR."""
+    p_obj = Path(p)
+    if (C.BASE_DIR / p_obj).exists():
+        return C.BASE_DIR / p_obj
+    if (C.DATASET_DIR / p_obj).exists():
+        return C.DATASET_DIR / p_obj
+    parts = PureWindowsPath(p).parts if "\\" in p else p_obj.parts
     return C.DATASET_DIR / parts[-2] / parts[-1]

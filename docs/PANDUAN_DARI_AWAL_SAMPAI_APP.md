@@ -8,13 +8,13 @@ Ringkasan alur:
 
 | Tahap | File | Masukan | Keluaran | Bisa dijalankan di |
 |-------|------|---------|----------|---------------------|
-| 0. Dataset | – | – | `dataset_gabung_fix/` | (sudah tersedia) |
-| 1. EDA | `EDA.py` | dataset | `eda_output/` | Laptop / Colab |
-| 2. Preprocessing | `run_preprocessing.py` | dataset + `eda_output/` | `preprocessing_output/` | Laptop / Colab |
-| 3. Pelatihan | `train_model.py` | `preprocessing_output/` | `hasil_M1/` s.d. `hasil_M4/` | **Colab (GPU)** |
-| 4. Evaluasi | `evaluasi.py` | `hasil_Mx/` | `evaluasi_output/` | Colab / Laptop |
-| 5. Coretan non-aksara | `buat_outlier.py`, `train_oe.py` | `hasil_M2/` + dataset | `outlier/`, `hasil_M2OE/` | **Colab (GPU)** |
-| 6. Aplikasi | `app/main.py` | `hasil_M2OE/` (atau `hasil_M2/`) + `preprocessing_output/` | website lokal | Laptop |
+| 0. Dataset | – | – | `dataset/` | (sudah tersedia) |
+| 1. EDA | `EDA.py` | dataset | `eda_output/` | VS Code (Terminal) |
+| 2. Preprocessing | `run_preprocessing.py` | dataset + `eda_output/` | `preprocessing_output/` | VS Code (Terminal) |
+| 3. Pelatihan | `train_model.py` | `preprocessing_output/` | `hasil_M1/` s.d. `hasil_M4/` | **VS Code (Terminal/Notebook)** |
+| 4. Evaluasi | `evaluasi.py` | `hasil_Mx/` | `evaluasi_output/` | VS Code (Terminal/Notebook) |
+| 5. Coretan non-aksara | `buat_outlier.py`, `train_oe.py` | `hasil_M2/` + dataset | `outlier/`, `hasil_M2OE/` | **VS Code (Terminal/Notebook)** |
+| 6. Aplikasi | `app/main.py` | `hasil_M2OE/` (atau `hasil_M2/`) + `preprocessing_output/` | website lokal | VS Code (Terminal) |
 
 Setiap tahap memakai hasil tahap sebelumnya, jadi urutannya tidak boleh dilompati.
 
@@ -22,7 +22,7 @@ Setiap tahap memakai hasil tahap sebelumnya, jadi urutannya tidak boleh dilompat
 
 ## Tahap 0: Dataset
 
-Folder `dataset_gabung_fix/` berisi 30 subfolder, satu per aksara (`a`, `ae`, `ba`, ... `za`). Nama subfolder adalah label kelasnya.
+Folder `dataset/` berisi 30 subfolder, satu per aksara (`a`, `ae`, `ba`, ... `za`). Nama subfolder adalah label kelasnya.
 
 Dataset ini gabungan dua sumber: foto kamera (nama berkas `IMG_...`) dan citra dari sumber lain. Versi di repositori sudah tanpa satu citra duplikat, sehingga berisi **1.799 citra** (laporan menyebut 1.800 citra mentah sebelum duplikat dibuang).
 
@@ -110,26 +110,22 @@ Proses pelatihan:
 3. **Tahap 2:** 30 lapisan terakhir ikut dilatih (fine-tuning, learning rate 0,00001).
 4. Early stopping: berhenti jika validation loss tidak membaik selama 5 epoch. Bobot terbaik disimpan.
 
-### Cara menjalankan (disarankan: Google Colab)
+### Cara menjalankan di VS Code
 
-Pelatihan butuh GPU. Di laptop tanpa GPU bisa memakan waktu berjam-jam per model.
+Pelatihan dapat dijalankan langsung via Terminal atau menggunakan Jupyter Notebook di VS Code:
 
-1. Upload `aksara-sunda-resnet50-glcm.zip` (zip repositori ini) ke **My Drive**. Tidak perlu diekstrak.
-2. Upload `notebooks/Pelatihan_M1_M2.ipynb` ke My Drive, klik kanan, pilih **Open with > Google Colaboratory**.
-3. **Runtime > Change runtime type > T4 GPU > Save**.
-4. **Runtime > Run all**, lalu izinkan akses Google Drive.
-5. Tunggu sampai tabel perbandingan M1 vs M2 muncul di bawah (sekitar 20 sampai 30 menit).
-6. Untuk M3, M4, dan evaluasi: buka `notebooks/Lanjutan_M3_M4_Evaluasi.ipynb` dengan cara yang sama, lalu Run all.
-
-Semua hasil tersimpan di `My Drive/aksara-sunda-resnet50-glcm/`.
-
-### Cara menjalankan di laptop (opsional)
-
+**Opsi A: Terminal VS Code**
 ```bash
 python train_model.py --model M1 --smoke    # uji cepat 1 sampai 2 menit, memastikan tidak ada error
 python train_model.py --model M1
 python train_model.py --model M2
 ```
+
+**Opsi B: Jupyter Notebook di VS Code**
+1. Buka folder proyek di VS Code.
+2. Buka `notebooks/Pelatihan_M1_M2.ipynb`.
+3. Pilih kernel Python yang sesuai dan jalankan sel satu per satu.
+4. Untuk M3, M4, dan evaluasi: buka `notebooks/Lanjutan_M3_M4_Evaluasi.ipynb`.
 
 Keluaran setiap model di `hasil_Mx/`:
 
@@ -196,7 +192,7 @@ Langkah:
 2. `python train_oe.py` memuat M2, lalu melatihnya lanjut dalam dua tahap (kepala klasifikasi, lalu 30 lapisan akhir ResNet50). Setiap batch berisi 32 aksara dan 32 coretan.
 3. Ambang "tidak dikenali" diambil dari data validasi aksara (persentil ke-5 persentase tertinggi), sehingga sekitar 95% aksara asli tetap diterima.
 
-Di Colab: buka `notebooks/Outlier_Exposure_M2OE.ipynb`, lalu *Run all*.
+Di VS Code: jalankan via terminal (`python buat_outlier.py` lalu `python train_oe.py`) atau buka `notebooks/Outlier_Exposure_M2OE.ipynb`.
 
 Hasil di `hasil_M2OE/`:
 
@@ -217,13 +213,13 @@ Hasil di `hasil_M2OE/`:
 Aplikasi **tidak membutuhkan dataset**, hanya hasil pelatihan:
 
 ```
-hasil_M2OE/best.keras                    (hasil Tahap 5, unduh dari Google Drive)
+hasil_M2OE/best.keras                    (hasil Tahap 5)
 hasil_M2OE/ambang_ood.json               (hasil Tahap 5)
 preprocessing_output/scaler_glcm.joblib  (sudah ada di repositori)
 preprocessing_output/class_names.json    (sudah ada di repositori)
 ```
 
-Cara menjalankan di laptop:
+Cara menjalankan di VS Code:
 
 ```bash
 pip install -r requirements.txt
@@ -255,8 +251,6 @@ File penting:
 | Pesan | Penyebab | Solusi |
 |-------|----------|--------|
 | `No module named 'cv2'` (atau modul lain) | Library belum terinstal | `pip install -r requirements.txt` |
-| `hasil_M2\best.keras tidak ditemukan` | Model belum diunduh / belum dilatih | Unduh `best.keras` ke folder `hasil_M2/` |
-| `mount failed` di Colab | Izin Google Drive gagal | Runtime > Disconnect and delete runtime, jalankan sel pertama saja, izinkan semua akses |
-| `GPU: []` di Colab | GPU belum aktif | Runtime > Change runtime type > T4 GPU |
+| `hasil_M2\best.keras tidak ditemukan` | Model belum dilatih | Jalankan `python train_model.py --model M2` |
 | Aplikasi langsung berhenti tanpa pesan | Menjalankan versi lama `main.py` | Pakai `python app/main.py` dari repositori ini atau `uvicorn app.main:app --port 8000` |
 | TensorFlow gagal diinstal | Versi Python tidak cocok | Gunakan Python 3.10 sampai 3.12 |

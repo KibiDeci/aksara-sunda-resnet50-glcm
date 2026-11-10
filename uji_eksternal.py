@@ -8,7 +8,7 @@ Susun data seperti ini (sejajar dengan config.py):
     │   ├── sari_a.jpg
     │   └── ...
     ├── ae/
-    └── ... (30 folder kelas, nama sama dengan dataset_gabung_fix)
+    └── ... (30 folder kelas, nama sama dengan dataset)
 
 Nama berkas diawali nama/kode penulis lalu garis bawah (budi_..., p01_...),
 agar akurasi per penulis bisa dihitung.

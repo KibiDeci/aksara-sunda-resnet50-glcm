@@ -79,7 +79,7 @@ Panduan lengkap langkah demi langkah, dari dataset sampai aplikasi: [docs/PANDUA
 | Data validasi | 266 |
 | Data uji | 266 |
 
-Dataset disertakan di folder `dataset_gabung_fix` (30 subfolder kelas). Folder ini sudah tanpa satu citra duplikat, sehingga berisi 1.799 citra; angka 1.800 di tabel adalah jumlah sebelum duplikat dibuang. Sumber: [Aksara Sunda di Kaggle](https://www.kaggle.com/datasets/abdidwiramdani/aksara-sunda) (Abdi Dwi Ramdani).
+Dataset disertakan di folder `dataset` (30 subfolder kelas). Folder ini sudah tanpa satu citra duplikat, sehingga berisi 1.799 citra; angka 1.800 di tabel adalah jumlah sebelum duplikat dibuang. Sumber: [Aksara Sunda di Kaggle](https://www.kaggle.com/datasets/abdidwiramdani/aksara-sunda) (Abdi Dwi Ramdani).
 
 ## Hasil
 
@@ -111,11 +111,11 @@ Temuan utama:
 - Kesalahan yang paling sering muncul adalah pertukaran aksara *a*, *ae*, dan *eu*, yang memiliki bentuk dasar sama.
 - Data uji berasal dari pembagian acak dataset publik, sehingga akurasi pada tulisan orang baru kemungkinan lebih rendah.
 
-Rincian lengkap ada di folder `evaluasi_output/` dan `hasil_M1/` sampai `hasil_M4/`.
+Rincian lengkap (tabel perbandingan, uji McNemar, F1 per kelas, confusion matrix) dibuat ulang oleh `train_model.py` dan `evaluasi.py` di folder `hasil_M1/` sampai `hasil_M4/` dan `evaluasi_output/`.
 
 ### Coretan non-aksara (Outlier Exposure)
 
-Data: 2.100 citra non-aksara buatan (coretan, ikal, spiral, bentuk geometris, gelombang, arsiran, huruf dan angka Latin) di folder `outlier/`, dibagi 1.500 latih, 300 validasi, 300 uji. Citra yang terlalu mirip aksara asli dibuang otomatis.
+Data: 2.100 citra non-aksara buatan (coretan, ikal, spiral, bentuk geometris, gelombang, arsiran, huruf dan angka Latin) yang dibuat oleh `buat_outlier.py` di folder `outlier/`, dibagi 1.500 latih, 300 validasi, 300 uji. Citra yang terlalu mirip aksara asli dibuang otomatis.
 
 ![Contoh coretan non-aksara](docs/gambar/18_contoh_coretan_oe.png)
 
@@ -145,42 +145,66 @@ pip install -r requirements.txt
 
 ### 2. Dataset
 
-Dataset sudah tersedia di folder `dataset_gabung_fix`, jadi tidak perlu diunduh terpisah.
+Dataset sudah tersedia di folder `dataset`, jadi tidak perlu diunduh terpisah.
 
-### 3. Jalankan pipeline
+Repositori ini hanya berisi kode dan data mentah. Semua folder hasil (`eda_output/`, `preprocessing_output/`, `outlier/`, `hasil_M*/`, `evaluasi_output/`, dll.) dibuat oleh script pada langkah berikut.
+
+### 3. Jalankan pipeline dari awal (Terminal VS Code)
+
+Jalankan dari folder proyek (sejajar dengan `config.py`), berurutan dari atas ke bawah. Setiap langkah membutuhkan hasil langkah sebelumnya.
+
+| No | Perintah | Menghasilkan | Butuh |
+|----|----------|--------------|-------|
+| 1 | `python EDA.py` | `eda_output/` (grafik EDA, pembagian latih/validasi/uji) | `dataset/` |
+| 2 | `python run_preprocessing.py` | `preprocessing_output/` (cache citra, fitur dan scaler GLCM, daftar kelas) | `eda_output/` |
+| 3 | `python train_model.py --model M1` | `hasil_M1/` | `preprocessing_output/` |
+| 4 | `python train_model.py --model M2` | `hasil_M2/` | `preprocessing_output/` |
+| 5 | `python train_model.py --model M3` | `hasil_M3/` | `preprocessing_output/` |
+| 6 | `python train_model.py --model M4` | `hasil_M4/` | `preprocessing_output/` |
+| 7 | `python evaluasi.py` | `evaluasi_output/` | minimal satu `hasil_Mx/best.keras` |
+| 8 | `python buat_outlier.py` | `outlier/` (2.100 citra coretan non-aksara) | `preprocessing_output/` |
+| 9 | `python train_oe.py` | `hasil_M2OE/` (model M2-OE dan ambang "Tidak dikenali") | `hasil_M2/best.keras`, `outlier/` |
+| 10 | `python uji_eksternal.py` | `uji_eksternal_output/` (opsional) | folder `uji_eksternal/`, minimal satu `hasil_Mx/best.keras` |
+
+Ringkasnya:
 
 ```bash
+python EDA.py
 python run_preprocessing.py
 python train_model.py --model M1
 python train_model.py --model M2
 python train_model.py --model M3
 python train_model.py --model M4
 python evaluasi.py
-python train_oe.py        # M2-OE, butuh hasil_M2/best.keras
+python buat_outlier.py
+python train_oe.py
+python uji_eksternal.py      # opsional
 ```
 
 Catatan:
 
-- Folder `eda_output` berisi pembagian data asli yang dipakai di laporan, jadi `EDA.py` tidak perlu dijalankan ulang. Menjalankannya ulang di folder proyek akan membuat pembagian data baru (dengan 1.799 citra) sehingga hasil tidak lagi sama dengan laporan.
-- Folder `preprocessing_output` sudah berisi hasil preprocessing (pembagian data akhir, scaler GLCM, daftar kelas). `run_preprocessing.py` tetap perlu dijalankan sekali sebelum pelatihan untuk membuat cache citra `preprocessed_224.npz` (sekitar 1 menit).
+- Pelatihan empat model paling lama; di GPU sekitar puluhan menit per model, di CPU bisa beberapa jam.
+- Hasil pelatihan di GPU sedikit berbeda setiap kali diulang walaupun memakai `SEED = 42`, sehingga angka akurasi bisa berbeda tipis dari tabel di bagian Hasil.
+- `EDA.py` membagi ulang data dari folder `dataset/` (1.799 citra, karena satu duplikat sudah dibuang). Pembagian ini bisa berbeda dari pembagian yang dipakai di laporan (dibuat dari 1.800 citra).
+- `uji_eksternal.py` butuh folder `uji_eksternal/` berisi tulisan tangan penulis baru, dengan 30 subfolder kelas dan nama berkas diawali nama penulis (misal `budi_a.jpg`). Format lengkap ada di docstring `uji_eksternal.py`. Data ini hanya untuk evaluasi akhir, jangan dipakai untuk pelatihan.
 
-### 4. Alternatif: Google Colab (disarankan, memakai GPU)
+### 4. Menjalankan via Jupyter Notebook di VS Code
 
-Notebook ada di folder `notebooks`:
+Jika lebih nyaman memakai notebook interaktif di VS Code (dengan ekstensi Jupyter), jalankan berurutan:
 
-- `Pelatihan_M1_M2.ipynb` untuk preprocessing serta pelatihan M1 dan M2.
-- `Lanjutan_M3_M4_Evaluasi.ipynb` untuk pelatihan M3, M4, dan evaluasi semua model.
-- `Outlier_Exposure_M2OE.ipynb` untuk melatih M2-OE (setelah M2 selesai).
+1. `python EDA.py` di terminal terlebih dahulu (notebook tidak menjalankan EDA).
+2. `notebooks/Pelatihan_M1_M2.ipynb`: preprocessing serta pelatihan M1 dan M2.
+3. `notebooks/Lanjutan_M3_M4_Evaluasi.ipynb`: pelatihan M3, M4, dan evaluasi semua model.
+4. `notebooks/Outlier_Exposure_M2OE.ipynb`: membuat citra coretan (`buat_outlier.py`) dan melatih M2-OE.
 
-Upload zip repositori ini (`aksara-sunda-resnet50-glcm.zip`) ke My Drive tanpa diekstrak, buka notebook di Colab, pilih GPU T4, lalu jalankan *Runtime > Run all*. Notebook akan mengekstrak zip secara otomatis.
+Buka notebook di VS Code dan jalankan sel satu per satu.
 
 ### 5. Jalankan aplikasi web
 
-File yang dibutuhkan:
+File yang dibutuhkan (semuanya dibuat oleh langkah 3):
 
-- `hasil_M2OE/best.keras` dan `hasil_M2OE/ambang_ood.json` (hasil `train_oe.py`), atau `hasil_M2/best.keras` bila M2-OE belum dilatih (tanpa deteksi "Tidak dikenali")
-- `preprocessing_output/scaler_glcm.joblib` (sudah tersedia)
-- `preprocessing_output/class_names.json` (sudah tersedia)
+- `hasil_M2OE/best.keras` dan `hasil_M2OE/ambang_ood.json` (dari `train_oe.py`), atau `hasil_M2/best.keras` bila M2-OE belum dilatih (tanpa deteksi "Tidak dikenali")
+- `preprocessing_output/scaler_glcm.joblib` dan `preprocessing_output/class_names.json` (dari `run_preprocessing.py`)
 
 ```bash
 python app/main.py
@@ -188,9 +212,50 @@ python app/main.py
 
 Buka `http://localhost:8000` di browser.
 
+### 6. Dataset tulisan tangan dari formulir (opsional)
+
+Folder `pemisahan_dataset/` berisi alat untuk memotong foto formulir tulisan tangan (tabel 8 kolom x 10 baris = 80 aksara per lembar) menjadi satu citra per aksara berukuran 224 x 224.
+
+Susun foto formulir seperti ini (nama subfolder = nama kelas, sama dengan `dataset/`; nama berkas bebas):
+
+```
+foto_formulir/
+├── da/
+│   ├── Ballpoint 1.jpeg
+│   └── Ballpoint 2.jpeg
+├── na/
+└── ta/
+```
+
+Lalu jalankan:
+
+```bash
+python pemisahan_dataset/split_dataset_manual.py
+```
+
+Hasil ada di `dataset_tulisan_tangan/<kelas>/<kelas>_001.jpg`, dst. Foto boleh portrait atau landscape dan sedikit miring; orientasi dan kelengkungan kertas ditangani otomatis. Versi notebook dengan preview: `pemisahan_dataset/pemisahan_dataset.ipynb`. Rincian di [pemisahan_dataset/README.md](pemisahan_dataset/README.md).
+
+## Folder hasil
+
+Semua folder berikut dibuat oleh script dan aman dihapus. Untuk membuatnya lagi, jalankan ulang script pembuatnya sesuai urutan di langkah 3.
+
+| Folder | Dibuat oleh |
+|--------|-------------|
+| `eda_output/` | `EDA.py` |
+| `preprocessing_output/` | `run_preprocessing.py` |
+| `hasil_M1/` s.d. `hasil_M4/` | `train_model.py --model Mx` |
+| `evaluasi_output/` | `evaluasi.py` |
+| `outlier/` | `buat_outlier.py` |
+| `hasil_M2OE/` | `train_oe.py` |
+| `uji_eksternal_output/` | `uji_eksternal.py` |
+| `dataset_tulisan_tangan/` | `pemisahan_dataset/split_dataset_manual.py` |
+| `__pycache__/` | Python (otomatis) |
+
+Jangan hapus `dataset/`, `foto_formulir/`, dan `uji_eksternal/`; ketiganya data mentah yang tidak bisa dibuat ulang.
+
 ## Model terlatih
 
-File model `best.keras` tidak disimpan di repositori karena ukurannya melebihi batas GitHub (100 MB per file). Model dapat dilatih ulang dengan langkah di atas, sekitar 10 menit per model di GPU Google Colab.
+File model `best.keras` tidak disimpan di repositori karena ukurannya melebihi batas GitHub (100 MB per file). Model dapat dilatih ulang dengan langkah di atas di GPU atau CPU lokal.
 
 ## Isi repositori
 
@@ -209,16 +274,13 @@ File model `best.keras` tidak disimpan di repositori karena ukurannya melebihi b
 | `glcm_features.py` | Ekstraksi 32 fitur GLCM |
 | `data_loader.py` | Penyedia batch data untuk Keras |
 | `app/` | Aplikasi web (FastAPI + HTML/JavaScript) |
-| `dataset_gabung_fix/` | Dataset citra (30 subfolder kelas) |
-| `eda_output/` | Hasil EDA dan pembagian data |
-| `preprocessing_output/` | Hasil preprocessing, scaler GLCM, daftar kelas |
-| `outlier/` | 2.100 citra coretan non-aksara (latih, validasi, uji) |
-| `hasil_M1/` s.d. `hasil_M4/` | Ringkasan hasil, riwayat pelatihan, confusion matrix tiap model |
-| `evaluasi_output/` | Tabel perbandingan, uji McNemar, F1 per kelas, gambar evaluasi |
-| `notebooks/` | Notebook Google Colab |
+| `dataset/` | Dataset citra (30 subfolder kelas) |
+| `foto_formulir/` | Foto formulir tulisan tangan mentah, per subfolder kelas |
+| `pemisahan_dataset/` | Pemotong foto formulir menjadi citra per aksara (script dan notebook) |
+| `notebooks/` | Jupyter Notebook untuk VS Code |
 | `docs/` | Panduan lengkap dan gambar laporan |
 | `requirements.txt` | Daftar library Python |
 
 ## Teknologi
 
-Python, TensorFlow/Keras, scikit-learn, scikit-image, OpenCV, FastAPI, HTML/CSS/JavaScript, Google Colab.
+Python, TensorFlow/Keras, scikit-learn, scikit-image, OpenCV, FastAPI, HTML/CSS/JavaScript, VS Code.

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageStat, UnidentifiedImageError
 
 BASE_DIR    = Path(__file__).resolve().parent          # folder tempat EDA.py berada
-DATASET_DIR = BASE_DIR / "dataset_gabung_fix"           # dataset harus sejajar dengan EDA.py
+DATASET_DIR = BASE_DIR / "dataset"                    # dataset harus sejajar dengan EDA.py
 OUT_DIR     = BASE_DIR / "eda_output"; OUT_DIR.mkdir(exist_ok=True)
 EXTS        = {".png", ".jpg", ".jpeg", ".bmp", ".webp", ".tif", ".tiff"}
 TARGET_SIZE = 224          # input ResNet50 & MobileNetV2 = 224x224
@@ -20,7 +20,7 @@ rows = []
 for cls_dir in sorted(p for p in DATASET_DIR.iterdir() if p.is_dir()):
     for f in cls_dir.rglob("*"):
         if f.suffix.lower() in EXTS:
-            rows.append({"path": str(f), "label": cls_dir.name})
+            rows.append({"path": str(f.relative_to(BASE_DIR)).replace("\\", "/"), "label": cls_dir.name})
 df = pd.DataFrame(rows)
 assert len(df), f"Tidak ada gambar ditemukan di {DATASET_DIR.resolve()}"
 print(f"Total gambar : {len(df):,}")
